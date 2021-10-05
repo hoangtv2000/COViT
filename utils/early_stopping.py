@@ -1,15 +1,15 @@
 import numpy as np
 import torch
+import os
 
 class EarlyStopping:
-    """Early stops the training and save checkpoints if validation loss doesn't improve after a given patience."""
+    """Early stops the training and save checkpoints if validation loss doesn't improve after a given patience.
+    """
     def __init__(self, config, logger, delta=0):
         """
         Args:
             patience (int): How long to wait after last time validation loss improved.
-                            Default: 7
             delta (float): Minimum change in the monitored quantity to qualify as an improvement.
-                            Default: 0
         """
         self.patience = config.epoch_patience
         self.counter = 0
@@ -62,4 +62,6 @@ class EarlyStopping:
                  'loss': val_loss}
         name = os.path.join(cpkt_dir, name + '_checkpoint.pth')
         print(name)
+        
         torch.save(state, name)
+        self.val_loss_min = val_loss

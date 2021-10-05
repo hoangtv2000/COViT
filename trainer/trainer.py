@@ -2,6 +2,7 @@ import os, json
 import torch
 import numpy as np
 
+from dataloader.dataloader import get_balance_train_data, get_val_data
 from .base_trainer import BaseTrainer
 from utils.util import one_hot_enc
 from metrics.metric import MetricTracker, sensitivity, positive_predictive_value
@@ -13,10 +14,9 @@ class Trainer(BaseTrainer):
     Trainer and Tracking metrics.
     """
 
-    def __init__(self, config, model, optimizer, data_loader, checkpoint_dir, logger,
-                 lr_scheduler, remaining_epoch=1, valid_data_loader=None, metric_ftns=None):
-        super(Trainer, self).__init__(config, data_loader, checkpoint_dir, logger,
-                                      valid_data_loader=valid_data_loader,
+    def __init__(self, config, model, optimizer, checkpoint_dir, logger,
+                 lr_scheduler, start_epoch=None, metric_ftns=None):
+        super(Trainer, self).__init__(config, checkpoint_dir, logger,
                                       metric_ftns=metric_ftns)
 
         if (self.config.cuda):
@@ -28,15 +28,14 @@ class Trainer(BaseTrainer):
         self.config = config
         self.logger = logger
 
+        self.start_epoch = 0
         if (config.load):
-            self.start_epoch = remaining_epoch
+            self.start_epoch = start_epoch
 
         # DataLoader
-        self.train_data_loader = data_loader
-        self.valid_data_loader = valid_data_loader
+        self.valid_data_loader = get_val_data(self.config)
 
         # Epochs
-        self.len_epoch = self.config.dataloader.train.batch_size * len(self.train_data_loader)
         self.epochs = self.config.epochs
 
         self.log_step = self.config.log_interval
@@ -50,7 +49,7 @@ class Trainer(BaseTrainer):
         self.early_stopping = EarlyStopping(self.config, self.logger)
 
         # Loss func
-        self.criterion = torch.nn.BCEWithLogitsLoss(reduction='mean')
+        self.criterion = torch.nn.CrossEntropyLoss()
 
         self.checkpoint_dir = checkpoint_dir
 
@@ -77,12 +76,11 @@ class Trainer(BaseTrainer):
         for batch_idx, (data, target) in enumerate(self.train_data_loader):
             self.optimizer.zero_grad()
             data = data.to(self.device)
-            gr_truth = one_hot_enc(target, self.config.dataloader.train.batch_size,\
-                            self.config.dataset.num_classes).to(self.device)
-            target = torch.tensor(target, dtype=torch.float32).to(self.device)
+            gr_truth = torch.tensor(target, dtype=torch.long).to(self.device)
             output = self.model(data)
 
             if (output.size(0) != gr_truth.size(0)):
+                print(f'Failed to load batch:{batch_idx}')
                 continue
 
             loss = self.criterion(output, gr_truth)
@@ -129,13 +127,14 @@ class Trainer(BaseTrainer):
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(loader):
                 data = data.to(self.device)
-                gr_truth = one_hot_enc(target, self.config.dataloader.val.batch_size,\
-                            self.config.dataset.num_classes).to(self.device)
-                target = torch.tensor(target, dtype=torch.float32).to(self.device)
+                gr_truth = torch.tensor(target, dtype=torch.long).to(self.device)
                 output = self.model(data)
 
+                if  (output.size(0) != gr_truth.size(0)):
+                    print(f'Failed to load batch:{batch_idx}')
+                    continue
+
                 loss = self.criterion(output, gr_truth)
-                loss = loss.mean()
 
                 prediction = torch.tensor(torch.argmax(output, dim=1), dtype=torch.float32)
                 accuracy = np.sum(prediction.cpu().numpy() == target.cpu().numpy())
@@ -161,12 +160,16 @@ class Trainer(BaseTrainer):
 
 
 
+
     def train(self):
         """
         Train the model
         """
         history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc':[]}
         for epoch in range(self.start_epoch, self.epochs):
+            self.train_data_loader = get_balance_train_data(self.config) # randomly sample data to balance
+            self.len_epoch = self.config.dataloader.train.batch_size * len(self.train_data_loader)
+
             torch.manual_seed(self.config.seed)
             train_loss, train_acc = self._train_epoch(epoch)
 
@@ -177,7 +180,7 @@ class Trainer(BaseTrainer):
                 os.makedirs(self.checkpoint_dir)
 
             self.early_stopping(self.checkpoint_dir, model=self.model, optimizer=self.optimizer,\
-                    scheduler=self.lr_scheduler, loss=val_loss, epoch=epoch, name='model_best')
+                    scheduler=self.lr_scheduler, val_loss=val_loss, epoch=epoch, name='model_best')
 
             self.lr_scheduler.step(val_loss)
 
@@ -200,7 +203,8 @@ class Trainer(BaseTrainer):
 
     def _progress(self, batch_idx, epoch, metrics, mode='', print_summary=False):
         metrics_string = metrics.calc_all_metrics()
-        if ((batch_idx * self.config.dataloader.train.batch_size) % self.log_step == 0):
+        iter = batch_idx * self.config.dataloader.train.batch_size
+        if (iter % self.log_step == 0 and iter !=0):
 
             if metrics_string == None:
                 self.logger.warning(f" No metrics")

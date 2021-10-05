@@ -40,22 +40,40 @@ def write_score(writer, iter, mode, metrics):
     writer.add_scalar(mode + '/acc', metrics.data['correct'] / metrics.data['total'], iter)
 
 
-def read_filepaths(file):
+def read_filepaths(file, root):
     """Collect data from annotation files.
     """
     print('Collecting data from : {}'. format(file))
 
     paths, labels = [], []
+
     with open(file, 'r') as f:
         lines = f.read().splitlines()
         for idx, line in enumerate(lines):
-            if len(line.split(' ')) == 5:
-                _, _, path, label, dataset = line.split(' ')
-            else:
+            if len(line.split(' ')) == 3:
+                _, path, label = line.split(' ')
+            elif len(line.split(' ')) == 4:
                 _, path, label, dataset = line.split(' ')
-            # path = path.split(' ')[-1]
+            elif len(line.split(' ')) == 5:
+                _, _, path, label, dataset = line.split(' ')
+            elif len(line.split(' ')) == 6:
+                _, _, path1, path2, label, dataset = line.split(' ')
+                path = path1 + path2
+
+            label = label.lower()
+
+            # Ignore duplicates filenames
+            if path in paths:
+                continue
+
+            # Ignore not exists filenames
+            img_path = root + path
+            if not os.path.exists(img_path):
+                continue
+
             paths.append(path)
             labels.append(label)
+
     return paths, labels
 
 
@@ -75,8 +93,9 @@ def seeding(config):
 def one_hot_enc(target, batch_size, n_classes):
     """One hot encode annos.
     """
-    y = torch.zeros(batch_size, n_classes)
-    y[range(y.shape[0]), target] = 1
+    y = torch.zeros(batch_size, n_classes, dtype=torch.long)
+    for yi in range(y.shape[0]):
+        y[yi, target] = 1
     return y
 
 
@@ -87,3 +106,13 @@ def get_checkpoints(modelname):
     list = glob.glob(f'../COVID_19/checkpoints/model_{modelname}/*')
     for i, x in enumerate(list):
         [print(i+1 ,':    ' ,x.split('\\')[-1])]
+
+
+
+def optimizer_to_cuda(optimizer, device):
+    """Moving optimizer to GPU after loading
+    """
+    for state in optimizer.state.values():
+        for k, v in state.items():
+            if isinstance(v, torch.Tensor):
+                state[k] = v.to(device)

@@ -7,9 +7,7 @@ class BaseTrainer:
     Base class for all trainers
     """
 
-    def __init__(self, config,  data_loader, checkpoint_dir, logger,
-                 valid_data_loader=None,
-                 test_data_loader=None, metric_ftns=None):
+    def __init__(self, config, checkpoint_dir, logger,  metric_ftns=None):
 
         self.config = config
         if self.config.cuda:
@@ -18,15 +16,7 @@ class BaseTrainer:
         else:
             self.device = torch.device("cpu")
         self.logger = logger
-        self.train_data_loader = data_loader
-        self.len_epoch = len(self.train_data_loader)
         self.epochs = self.config.epochs
-
-        self.valid_data_loader = valid_data_loader
-        self.test_data_loader = test_data_loader
-
-        self.do_validation = self.valid_data_loader is not None
-        self.do_test = self.test_data_loader is not None
         # setup GPU device if available, move model into configured device
         # self.device, device_ids = self._prepare_device(config['n_gpu'])
         self.logger = logger
