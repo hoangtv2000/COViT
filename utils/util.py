@@ -10,34 +10,11 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.optim as optim
+import matplotlib.pyplot as plt
 
-"""    def predict(self, epoch):
-        self.model.eval()
+from model.modelloader import COVID_PVTv2, COVID_ViT
 
-        predictions = []
-        with torch.no_grad():
-            for batch_idx, (data, target) in enumerate(self.test_data_loader):
-                data = data.to(self.device)
-                logits = self.model(data, None)
 
-                maxes, prediction = torch.max(logits, 1)  # get the index of the max log-probability
-                # log.info()
-                predictions.append(f"{target[0]},{prediction.cpu().numpy()[0]}")
-
-        pred_name = os.path.join(self.checkpoint_dir, f'validation_predictions_epoch_{epoch:d}_.csv')
-
-        # Write prediction to .csv
-        with open(pred_name, 'w') as fout:
-            for item in predictions:
-                # print(item)
-                fout.write(item)
-                fout.write('\n')
-
-        return predictions"""
-
-def write_score(writer, iter, mode, metrics):
-    writer.add_scalar(mode + '/loss', metrics.data['loss'], iter)
-    writer.add_scalar(mode + '/acc', metrics.data['correct'] / metrics.data['total'], iter)
 
 
 def read_filepaths(file, root):
@@ -74,6 +51,8 @@ def read_filepaths(file, root):
             paths.append(path)
             labels.append(label)
 
+    print('Data collected! {}'. format(file))
+
     return paths, labels
 
 
@@ -93,7 +72,7 @@ def seeding(config):
 def one_hot_enc(target, batch_size, n_classes):
     """One hot encode annos.
     """
-    y = torch.zeros(batch_size, n_classes, dtype=torch.long)
+    y = torch.zeros(batch_size, n_classes, dtype=torch.float32)
     for yi in range(y.shape[0]):
         y[yi, target] = 1
     return y
@@ -103,7 +82,7 @@ def one_hot_enc(target, batch_size, n_classes):
 def get_checkpoints(modelname):
     """List all of checkpoints.
     """
-    list = glob.glob(f'../COVID_19/checkpoints/model_{modelname}/*')
+    list = glob.glob(f'../COVID_19/checkpoints/{modelname}/*')
     for i, x in enumerate(list):
         [print(i+1 ,':    ' ,x.split('\\')[-1])]
 
@@ -116,3 +95,33 @@ def optimizer_to_cuda(optimizer, device):
         for k, v in state.items():
             if isinstance(v, torch.Tensor):
                 state[k] = v.to(device)
+
+
+def augmentation2raw(config, inp, show=False):
+    """Convert augmentated image to raw image.
+    """
+    if config.preprocess_type == 'torchio':
+        mean = np.array([0.5, 0.5, 0.5])
+        std = np.array([0.25, 0.25, 0.25])
+    else:
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+
+    inp = inp.numpy().transpose((1, 2, 0))
+    inp = std * inp + mean
+    inp = np.clip(inp, 0, 1)
+    if show == False:
+        return inp
+    else:
+        plt.imshow(inp)
+        plt.pause(0.001)
+
+
+
+def get_model(config, model_name):
+    if  model_name == 'model_ViT':
+        return COVID_ViT(config)
+    if  model_name == 'model_PVT_V2':
+        return COVID_PVTv2(config)
+    else:
+        raise ValueError(f'Expected model_PVT_V2 or model_ViT, found {model_name}')

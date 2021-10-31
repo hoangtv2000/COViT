@@ -1,8 +1,9 @@
 import os, json
 import torch
 import numpy as np
+from tqdm import tqdm
 
-from dataloader.dataloader import get_balance_train_data, get_val_data
+from dataloader_n_aug.dataloader import get_balance_train_data, get_val_data
 from .base_trainer import BaseTrainer
 from utils.util import one_hot_enc
 from metrics.metric import MetricTracker, sensitivity, positive_predictive_value
@@ -14,7 +15,7 @@ class Trainer(BaseTrainer):
     Trainer and Tracking metrics.
     """
 
-    def __init__(self, config, model, optimizer, checkpoint_dir, logger,
+    def __init__(self, config, model, optimizer, name_optimizer, checkpoint_dir, logger,
                  lr_scheduler, start_epoch=None, metric_ftns=None):
         super(Trainer, self).__init__(config, checkpoint_dir, logger,
                                       metric_ftns=metric_ftns)
@@ -29,22 +30,26 @@ class Trainer(BaseTrainer):
         self.logger = logger
 
         self.start_epoch = 0
-        if (config.load):
+        if (config.load_for_training):
             self.start_epoch = start_epoch
 
         # DataLoader
         self.valid_data_loader = get_val_data(self.config)
 
         # Epochs
-        self.epochs = self.config.epochs
+        self.epochs = self.config.epochs-1
 
+        # Step to write info to log
         self.log_step = self.config.log_interval
 
+        # Model
         self.model = model
         self.num_classes = config.dataset.num_classes
 
+        # Optimizer
         self.lr_scheduler = lr_scheduler
         self.optimizer = optimizer
+        self.name_optimizer = name_optimizer
 
         self.early_stopping = EarlyStopping(self.config, self.logger)
 
@@ -61,6 +66,29 @@ class Trainer(BaseTrainer):
         self.confusion_matrix = torch.zeros(self.num_classes, self.num_classes)
 
 
+    def _optimizer_coordinating(self, data, output, gr_truth):
+        """For the option of the primary or complex optimizer.
+        """
+        if self.name_optimizer == 'AdamW':
+            loss = self.criterion(output, gr_truth)
+            loss.backward()
+            self.optimizer.step()
+
+        if self.name_optimizer == 'SAM_SGD' or self.name_optimizer == 'SAM_AdamW':
+            # first forward-backward pass
+            loss = self.criterion(output, gr_truth)
+            loss.backward(retain_graph=True)
+            self.optimizer.first_step(zero_grad=True)
+
+            # second forward-backward pass
+            output_2 = self.model(data)
+            loss_2 = self.criterion(output_2, gr_truth)
+            loss_2.backward()
+            self.optimizer.second_step(zero_grad=True)
+
+        return loss
+
+
 
     def _train_epoch(self, epoch):
         """
@@ -75,6 +103,11 @@ class Trainer(BaseTrainer):
 
         for batch_idx, (data, target) in enumerate(self.train_data_loader):
             self.optimizer.zero_grad()
+            # data = data.to(self.device)
+            # gr_truth = one_hot_enc(target, self.config.dataloader.train.batch_size,\
+            #                 self.config.dataset.num_classes).to(self.device)
+            # target = torch.tensor(target, dtype=torch.float32).to(self.device)
+
             data = data.to(self.device)
             gr_truth = torch.tensor(target, dtype=torch.long).to(self.device)
             output = self.model(data)
@@ -83,9 +116,8 @@ class Trainer(BaseTrainer):
                 print(f'Failed to load batch:{batch_idx}')
                 continue
 
-            loss = self.criterion(output, gr_truth)
-            (loss).backward()
-            self.optimizer.step()
+            # Performing optimizers
+            loss = self._optimizer_coordinating(data, output, gr_truth)
 
             prediction = torch.tensor(torch.argmax(output, dim=1), dtype=torch.float32)
             accuracy = np.sum(prediction.cpu().numpy() == target.cpu().numpy())
@@ -120,12 +152,15 @@ class Trainer(BaseTrainer):
         Returns: validation loss
         """
         self.model.eval()
-        self.valid_sentences = []
         self.valid_metrics.reset()
         self.confusion_matrix = 0* self.confusion_matrix
 
         with torch.no_grad():
             for batch_idx, (data, target) in enumerate(loader):
+                # data = data.to(self.device)
+                # gr_truth = one_hot_enc(target, self.config.dataloader.train.batch_size,\
+                #                 self.config.dataset.num_classes).to(self.device)
+                # target = torch.tensor(target, dtype=torch.float32).to(self.device)
                 data = data.to(self.device)
                 gr_truth = torch.tensor(target, dtype=torch.long).to(self.device)
                 output = self.model(data)
@@ -167,10 +202,12 @@ class Trainer(BaseTrainer):
         """
         history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc':[]}
         for epoch in range(self.start_epoch, self.epochs):
+            torch.manual_seed(self.config.seed)
+            torch.autograd.set_detect_anomaly(True)
+
             self.train_data_loader = get_balance_train_data(self.config) # randomly sample data to balance
             self.len_epoch = self.config.dataloader.train.batch_size * len(self.train_data_loader)
 
-            torch.manual_seed(self.config.seed)
             train_loss, train_acc = self._train_epoch(epoch)
 
             self.logger.info(f"{'!' * 10}    VALIDATION   {'!' * 10}")
@@ -189,15 +226,13 @@ class Trainer(BaseTrainer):
             history['val_loss'].append(val_loss)
             history['val_acc'].append(val_acc)
 
-            if self.early_stopping == True:
+            if self.early_stopping.early_stop == True:
                 self.logger.info(f'Training session ends at epoch: {epoch}')
                 break
 
-        writer = os.path.join(self.checkpoint_dir, 'writer.txt')
-        f = open(writer, "w")
-        f.write(json.dumps(history))
-
-
+            writer = os.path.join(self.checkpoint_dir, 'writer.txt')
+            f = open(writer, "w")
+            f.write(json.dumps(history))
 
 
 

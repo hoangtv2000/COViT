@@ -11,8 +11,6 @@ class MetricTracker:
 
         self.writer = writer
         self.mode = mode + '/'
-        self.keys = keys
-        # print(self.keys)
         self._data = pd.DataFrame(index=keys, columns=['total', 'counts', 'average'])
         self.reset()
 
@@ -38,8 +36,7 @@ class MetricTracker:
         return dict(self._data.average)
 
     def calc_all_metrics(self):
-        """
-        Calculates string with all the metrics
+        """Calculates string with all the metrics
         """
         s = ''
         d = dict(self._data.average)
@@ -55,18 +52,10 @@ class MetricTracker:
         return s
 
 
-def top_k_acc(output, target, k=3):
-    with torch.no_grad():
-        pred = torch.topk(output, k, dim=1)[1]
-        assert pred.shape[0] == len(target)
-        correct = 0
-        for i in range(k):
-            correct += torch.sum(pred[:, i] == target).item()
-    return correct / len(target)
-
 
 def confusion_matrix(predictions, targets):
     return sklearn.metrics.confusion_matrix(targets, predictions)
+
 
 def sensitivity(cnf_matrix):
     """ie. recall
@@ -90,8 +79,5 @@ def positive_predictive_value(cnf_matrix):
     FN = cnf_matrix.sum(axis=1) - np.diag(cnf_matrix)
     TP = np.diag(cnf_matrix)
     TN = cnf_matrix.sum() - (FP + FN + TP)
-    # print(TP)
-    # print(FP)
-    # print(TP / (TP + FP))
-    # print(TP.sum() / (TP + FP).sum())
+ 
     return TP / (TP + FP + eps)

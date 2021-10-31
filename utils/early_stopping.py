@@ -60,8 +60,8 @@ class EarlyStopping:
                  'optimizer': optimizer.state_dict(),
                  'scheduler': scheduler.state_dict(),
                  'loss': val_loss}
-        name = os.path.join(cpkt_dir, name + '_checkpoint.pth')
-        print(name)
-        
-        torch.save(state, name)
+        cpkt_name = os.path.join(cpkt_dir, name + '_checkpoint.pth')
+        print(cpkt_name)
+
+        torch.save(state, cpkt_name)
         self.val_loss_min = val_loss

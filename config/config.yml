@@ -1,0 +1,86 @@
+config:
+  cwd: C:/Users/ASUS/COVID_19 # working directory
+  pretrained_dir:  C:/Users/ASUS/COVID_19/model
+  epochs: 24
+  seed: 1234 # randomness seed
+  cuda: True # use nvidia gpu
+  gpu: 0 # id of gpu
+  epoch_patience: 5 # Patience for early stopping
+
+  load_for_training: True # load our pretrained checkpoint for training
+
+  ImgNet_pretrained: False # If not load our pretrained checkpoint, do u want to use ImageNet pretrained?
+  block_collect: 99 # Get the ImageNet pretrained block
+
+  freeze: True # Freeze blocks of model
+  freeze_block: 3 # Freeze from the begining (0) to 'freeze_block' (n-1) block
+
+
+  # Choose type of image processing;
+  # we provie 2 types: base; torchio
+  # base for base and autoaug augmentation, torchio for torchio aougmentation
+  preprocess_type: base
+
+
+  log_interval: 200 # Print statistics every n samples.
+
+  model_ViT:
+    name: ViT # model name
+    optimizer: # optimizer configuration
+      type: AdamW # optimizer type
+      lr: 3e-4 # learning rate
+      weight_decay: 0.000001 # weight decay
+    scheduler: # learning rate scheduler
+      type: ReduceLRonPlateau # type of scheduler
+      scheduler_factor: 0.5 # learning rate change ratio
+      scheduler_patience: 0 # patience for some epochs
+      scheduler_min_lr: 5e-6 # minimum learning rate value
+      scheduler_verbose: True # print if learning rate is changed
+
+  model_PVT_V2:
+    name: PVT_V2 # model name
+    pretrained_cpkt: /pvt_v2_b0.pth  #/pvt_v2_b0.pth /pvt_v2_b2_li.pth
+    optimizer: # optimizer configuration
+      type: AdamW # optimizer type, choose: AdamW SAM_AdamW
+      lr: 3e-4 # learning rate
+      weight_decay: 0.000001 # weight decay
+    scheduler: # learning rate scheduler
+      type: ReduceLRonPlateau # type of scheduler
+      scheduler_factor: 0.6 # learning rate change ratio
+      scheduler_patience: 0 # patience for some epochs
+      scheduler_min_lr: 5e-6 # minimum learning rate value
+      scheduler_verbose: True # print if learning rate is changed
+
+  dataloader:
+    train:
+      batch_size: 12 # batch size
+      shuffle: True # shuffle samples after every epoch
+      num_workers: 4 # number of thread for dataloader
+    val:
+      batch_size: 12 # batch size
+      shuffle: True # shuffle samples after every epoch
+      num_workers: 4
+    test:
+      batch_size: 12
+      shuffle: False
+      num_workers: 2
+
+  dataset:
+    input_data: C:/Users/ASUS/COVID_19/data/
+    img_folder: C:/Users/ASUS/COVID_19/data/all_images/
+    name: COVIDXR_dataset
+    type: multi_target
+    num_classes: 3
+    class_dict: {'pneumonia': 0, 'normal': 1, 'covid-19': 2}
+
+    img_size: [256, 256] # image dimension
+    gradcam_img_size: [224, 224]  # image dimension required for gradcam visualizer
+
+    #Choose type of image augmentation;
+    # we provie 4 types of augmentation: base; autoaug; torchio
+    train:
+      augmentation: True # do augmentation
+    val:
+      augmentation: False
+    test:
+      augmentation: False
