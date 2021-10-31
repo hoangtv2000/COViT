@@ -4,7 +4,7 @@
 
 ### A. Theorical Comprehensive Analysis of the CNN and ViT
 
-### B. Technical tool for applying ANNs to COVID-19 and Pneumonia cases diagnosis
+### B. Techincal tool for COVID-19 and Pneumonia cases diagnosis and heatmap generation  
 
 + [config](https://github.com/hoangtv2000/COViT/tree/master/config): 
 + [data](https://github.com/hoangtv2000/COViT/tree/master/data): 
