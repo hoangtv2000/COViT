@@ -4,7 +4,7 @@
 
 ### A. Theorical Comprehensive Analysis of the CNN and ViT
 
-### B. Applying PVTv2 to COVID-19 and Pneumonia cases diagnosis via CXR images
+### B. Applying PVTv2 for COVID-19 and Pneumonia cases diagnosis via CXR images
 
 + [config](https://github.com/hoangtv2000/COViT/tree/master/config): 
 + [data](https://github.com/hoangtv2000/COViT/tree/master/data): 
