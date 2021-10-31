@@ -1,4 +1,6 @@
-<h2 align="center">Application of Artificial Neural Networks in COVID-19 and Pneumonia cases diagnosis via CXR images: A comprehensive analysis for the evolution of Vision Transformers</h2>
+<h2 align="center">Application of Artificial Neural Networks in COVID-19 and Pneumonia cases diagnosis via CXR images:
+  
+  A comprehensive analysis for the evolution of Vision Transformers</h2>
 
 ## A. Comprehensive Theorical Analysis of the CNN and ViT
 
