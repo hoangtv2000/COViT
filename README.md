@@ -2,7 +2,7 @@
   
   A comprehensive analysis for the evolution of Vision Transformers</h2>
 
-### A. Theorical Comprehensive Analysis of the CNN and ViT
+### A. Theorical comprehensive analysis of the CNN and ViT
 
 ### B. Techincal tool for COVID-19 and Pneumonia cases diagnosis and heatmap generation  
 
