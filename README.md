@@ -1,5 +1,5 @@
 # COViT
-## Covid_19 diagnosis via Chest X-Ray images by SOTA artificial neural networks.
+## Covid_19 an Pneumonia diagnosis via Chest X-Ray images by SOTA artificial neural networks.
 
 ## Module description
 + [config](https://github.com/hoangtv2000/COViT/tree/master/config): 
