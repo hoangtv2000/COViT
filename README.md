@@ -3,7 +3,7 @@
 
 ## Module description
 + [config](https://github.com/hoangtv2000/COViT/config): 
-+ [data](: 
++ [data](https://github.com/hoangtv2000/COViT/data): 
 + [dataloader_n_aug](https://github.com/hoangtv2000/COViT/dataloader_n_aug): 
 + [logger](https://github.com/hoangtv2000/COViT/logger): 
 + [metrics](https://github.com/hoangtv2000/COViT/metrics): 
