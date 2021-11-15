@@ -12,9 +12,9 @@ At the end of 2019, humankind was faced with an epidemic—severe acute respirat
 
 ## A. Paper and Seminar meterial
 
-⭐ For detail of report, watch [this paper](https://github.com/hoangtv2000/COViT/blob/master/paper.pdf).
+### ⭐ For detail of report, watch [this paper](https://github.com/hoangtv2000/COViT/blob/master/paper.pdf).
 
-⭐ For slide of the seminar, watch [here](https://docs.google.com/presentation/d/1jm7SXEqmMi34HPYUbEk2Falys974G5Gi/edit?usp=sharing&ouid=114052551064589379844&rtpof=true&sd=true).
+### ⭐ For slide of the seminar, watch [here](https://docs.google.com/presentation/d/1jm7SXEqmMi34HPYUbEk2Falys974G5Gi/edit?usp=sharing&ouid=114052551064589379844&rtpof=true&sd=true).
 
 ## B. Technial tool
 
@@ -36,11 +36,11 @@ Annotations for modules of the tecnical tool.
 
 ## C. Results
 ### The Exp.5 model
-Click [here](https://drive.google.com/file/d/19parqLAjLeRDvfSzPOuAT9LDHsu8OWbi/view?usp=sharing) to download this model checkpoint.
+#### Click [here](https://drive.google.com/file/d/19parqLAjLeRDvfSzPOuAT9LDHsu8OWbi/view?usp=sharing) to download this model checkpoint.
 
-Belows are the experimental results of the PVTv2-b2-li in the Exp.5, trained and tested on the COVIDx8A.
+#### Belows are the experimental results of the PVTv2-b2-li in the Exp.5, trained and tested on the COVIDx8A.
 
-Experimental results on the test set including 214 COVID-19 test cases.
+#### Experimental results on the test set including 214 COVID-19 test cases.
 <div class="tg-wrap"><table class="tg">
   <tr>
     <th class="tg-7btt" colspan="3">Sensitivity (%)</th>
