@@ -1,8 +1,9 @@
 import torch, torchvision
+import torch.nn.functional as F
 import pandas as pd
 from dataloader_n_aug.dataloader import get_test_data, get_val_data
 
-from metrics.metric import MetricTracker, sensitivity, positive_predictive_value
+from metrics.metric import MetricTracker, sensitivity, positive_predictive_value, F1_macro_score
 from model.modelloader import load_checkpoint
 from utils.util import *
 
@@ -76,14 +77,16 @@ class PredictAndVisualizer:
                     confusion_matrix[tar.long(), pred.long()] += 1
 
         # Metrics
-        self.s = sensitivity(confusion_matrix.numpy())
-        self.ppv = positive_predictive_value(confusion_matrix.numpy())
-        self.acc = self.test_metric.avg('acc')
+        s = sensitivity(confusion_matrix.numpy())
+        ppv = positive_predictive_value(confusion_matrix.numpy())
+        acc = self.test_metric.avg('acc')
+        F1_score = F1_macro_score(confusion_matrix.numpy())
 
         print('-'*30)
-        print(f'OVERALL Accuracy:    {self.acc}')
-        print(f'OVERALL Sensivity:   {self.s}')
-        print(f'OVERALL PosPredValue:{self.ppv}')
+        print(f'OVERALL Accuracy:     {acc}')
+        print(f'OVERALL Sensivity:    {s}')
+        print(f'OVERALL PosPredValue: {ppv}')
+        print(f'Macro_avg F1-score:   {F1_score}')
         print('-'*30)
 
         return confusion_matrix
@@ -133,17 +136,26 @@ class PredictAndVisualizer:
 
             # predict
             output = self.model(data)
+            percent_pred = F.softmax(output).cpu()
             prediction = int(torch.argmax(output, dim=1).cpu())
 
 
             _, axarr = plt.subplots(1,2)
 
             counter+=1
-            axarr[0].set_title(
-                'Image: {}\n\
-                 Ground truth: {}\n\
-                 Model prediction: {}'.format(counter, list(self.class_names)[int(target)],\
+            axarr[0].set_title(\
+                'Image: {:>4}\n\
+                 Ground truth: {:>4}\n\
+                 Model prediction: {:>4}'.format(counter, list(self.class_names)[int(target)],\
                                  list(self.class_names)[prediction]))
+
+            percent_out = list(percent_pred.detach().numpy())[0]*100
+
+            axarr[1].set_title(
+                'Class confidence:\n\
+                 Pneumonia : {:.2f}%\n\
+                 Normal : {:.2f}%\n\
+                 COVID_19 : {:.2f}%'.format(percent_out[0], percent_out[1], percent_out[2]))
 
             axarr[0].imshow(rgb_img)
             axarr[1].imshow(cam_image)
