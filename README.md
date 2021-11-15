@@ -35,12 +35,12 @@ Annotations for modules of the tecnical tool.
 
 
 ## C. Results
-### Model Exp.5
+### The Exp.5 model
+Click [here](https://drive.google.com/file/d/19parqLAjLeRDvfSzPOuAT9LDHsu8OWbi/view?usp=sharing) to download this model checkpoint.
 
-Belows are the experimental results of the PVTv2-b2-li in the Exp.5, trained and tested on the COVIDx8A (214 COVID-19 test)
+Belows are the experimental results of the PVTv2-b2-li in the Exp.5, trained and tested on the COVIDx8A.
 
-Click [here](https://drive.google.com/file/d/19parqLAjLeRDvfSzPOuAT9LDHsu8OWbi/view?usp=sharing) to download the model checkpoint.
-
+Experimental results on the test set including 214 COVID-19 test cases.
 <div class="tg-wrap"><table class="tg">
   <tr>
     <th class="tg-7btt" colspan="3">Sensitivity (%)</th>
