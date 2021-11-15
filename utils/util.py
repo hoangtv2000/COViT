@@ -125,3 +125,14 @@ def get_model(config, model_name):
         return COVID_PVTv2(config)
     else:
         raise ValueError(f'Expected model_PVT_V2 or model_ViT, found {model_name}')
+
+
+def split_dataframe(df, chunk_size=0): 
+    chunks = list()
+    num_chunks = len(df) // chunk_size + 1
+    for i in range(num_chunks):
+        chunks.append(df[i*chunk_size:(i+1)*chunk_size])
+    if len(chunks[-1]) < 2000:
+        chunks[-2] = pd.concat([chunks[-2], chunks[-1]])
+        chunks.pop()
+    return chunks
