@@ -79,5 +79,12 @@ def positive_predictive_value(cnf_matrix):
     FN = cnf_matrix.sum(axis=1) - np.diag(cnf_matrix)
     TP = np.diag(cnf_matrix)
     TN = cnf_matrix.sum() - (FP + FN + TP)
- 
+
     return TP / (TP + FP + eps)
+
+
+def F1_macro_score(cnf_matrix):
+    sens = sensitivity(cnf_matrix)
+    ppv = positive_predictive_value(cnf_matrix)
+    f1 = (2*sens*ppv)/(sens+ppv)
+    return np.sum(f1)/3
