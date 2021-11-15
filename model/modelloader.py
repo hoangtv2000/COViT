@@ -52,15 +52,16 @@ class COVID_PVTv2(nn.Module):
 
     def freeze_layers(self):
         self.pvt.freeze_patch_emb()
+        print(self.config.freeze_block)
         if self.config.freeze_block == 1:
             for p in self.pvt.block1.parameters():
                 p.requires_grad = False
-        if self.config.freeze_block == 2:
+        elif self.config.freeze_block == 2:
             for p in self.pvt.block1.parameters():
                 p.requires_grad = False
             for p in self.pvt.block2.parameters():
                 p.requires_grad = False
-        if self.config.freeze_block == 3:
+        elif self.config.freeze_block == 3:
             for p in self.pvt.block1.parameters():
                 p.requires_grad = False
             for p in self.pvt.block2.parameters():
@@ -127,9 +128,6 @@ class COVID_ViT(nn.Module):
 
 
 
-
-
-
 def load_checkpoint(checkpoint, model, optimizer=None, scheduler=None):
     """Loads model parameters (state_dict) from file_path. If optimizer is provided, loads state_dict of
     optimizer assuming it is present in checkpoint.
@@ -148,7 +146,9 @@ def load_checkpoint(checkpoint, model, optimizer=None, scheduler=None):
         raise ("File doesn't exist {}".format(checkpoint))
 
     if optimizer != None:
-            optimizer.load_state_dict(checkpoint_loader['optimizer'])
+        optimizer.load_state_dict(checkpoint_loader['optimizer'])
+        for g in optimizer.param_groups:
+            g['lr'] = 0.0001
 
     if scheduler != None:
         scheduler.load_state_dict(checkpoint_loader['scheduler'])
