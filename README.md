@@ -89,5 +89,5 @@ Annotations for modules of the tecnical tool.
 <p align="center">
 	<img src="https://github.com/hoangtv2000/COViT/blob/master/pics/ss.png" alt="photo not available" width="100%" height="100%">
 	<br>
-	<em>Heatmap generation and prediction confidence of 9 samples from test set.</em>
+	<em>Heatmap generation and prediction confidence of 8 stochasitcal samples from test set.</em>
 </p>
