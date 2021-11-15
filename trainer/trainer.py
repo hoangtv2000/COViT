@@ -69,7 +69,7 @@ class Trainer(BaseTrainer):
     def _optimizer_coordinating(self, data, output, gr_truth):
         """For the option of the primary or complex optimizer.
         """
-        if self.name_optimizer == 'AdamW':
+        if self.name_optimizer == 'AdamW' or self.name_optimizer == 'SGD':
             loss = self.criterion(output, gr_truth)
             loss.backward()
             self.optimizer.step()
