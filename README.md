@@ -3,18 +3,30 @@ pneumonia cases diagnosis via CXR images:
 A comprehensive analysis of Convolutional Neural Network and
 Vision Transformers</h3>
 
-## A. Theoretical comprehensive analysis of the CNN and ViT
+**Abstract.** 
+At the end of 2019, humankind was faced with an epidemic—severe acute respiratory syndrome coronavirus 2 (SARS CoV-2) related pneumonia, referred to as coronavirus disease 2019 (COVID-19) that people did not expect to encounter in the current era of technology. Nowadays, the COVID-19 situation becomes more and more severe, as well as sophisticated. And our country, Vietnam is being severely affected by this pandemic. That is why we have to take our actions immediately in order to cope with this pandemic. And the very first step in extinguishing this pandemic is that we have to rapidly and precisely identify COVID-19 cases. One significant improvement of the industrial revolution 4.0 is the application of information technology to medical diagnosis as an automatic method. The advances in artificial intelligence (AI) have enabled the implementation of sophisticated applications that can meet clinical accuracy requirements. Thus, various works propose an AI-based solution via X-ray image diagnosis as a quick testing method, which has high productivity in a short time. They majorly employ the Convolutional Neural Networks as their base feature extractor module. Especially different from their works, our study proposes the Vision-Transformer-based method as the novel approach. Our work covers the diagnosis of COVID-19 Pneumonia, the Viral Pneumonia cases, compared to normal (non-respiratory-disease) cases. Along with the strong data augmentation based on the clinical consideration, our Pyramid Vision Transformer achieves **92.99\%**, **92.38\%** sensitivity and **97.55\%**, **89.81\%** positive predictive value respectively to the COVID-19 and pneumonia cases on COVIDx8A dataset in the COVID-Net. Our proposed solution can detect COVID-19 in a Chest X-Ray image. The heatmap and confidence score of the detection is also demonstrated, such that the common users or doctors can use them for a final diagnosis in practical usages.\
 
-## B. Techincal tool for COVID-19 and Pneumonia cases diagnosis and heatmap generation  
+**Keywords**: COVID-19, Deep Learning, Vision Transformer, Chest X-ray (CXR), diagnosis.
 
+
+
+## A. Paper and Seminar meterial
+
+⭐ For detail of report, watch [this paper](https://github.com/hoangtv2000/COViT/blob/master/paper.pdf).
+
+⭐ For slide of the seminar, watch [here](https://docs.google.com/presentation/d/1jm7SXEqmMi34HPYUbEk2Falys974G5Gi/edit?usp=sharing&ouid=114052551064589379844&rtpof=true&sd=true).
+
+## B. Technial tool
+
+Annotations for modules of the tecnical tool.
 + [config](https://github.com/hoangtv2000/COViT/tree/master/config): Store a configuration file used for both training and inference phase.
-+ [data](https://github.com/hoangtv2000/COViT/tree/master/data): Store annotation files for training, validation and test, including: train/ val/ test.txt
++ [data](https://github.com/hoangtv2000/COViT/tree/master/data): Store image and annotation files for training, validation and test, including: train/ val/ test.txt. 
 + [dataloader_n_aug](https://github.com/hoangtv2000/COViT/tree/master/dataloader_n_aug): Store code for dataloader and 3 types of data augmentation.
 + [logger](https://github.com/hoangtv2000/COViT/tree/master/logger): Store logger of the training phase.
 + [metrics](https://github.com/hoangtv2000/COViT/tree/master/metrics): Store the specific module for calculating evaluation metric.
 + [model](https://github.com/hoangtv2000/COViT/tree/master/model): Store models, downloaded pretrained checkpoints and modelloader.
 + [predict_n_visualizer](https://github.com/hoangtv2000/COViT/tree/master/predict_n_visualizer): Include code for inference phase and visualizer.
-+ [pytorch_grad_cam](https://github.com/hoangtv2000/COViT/tree/master/pytorch_grad_cam): Store Heatmap visualizer by GradCAM, code of this module taken from [here](https://github.com/jacobgil/pytorch-grad-cam)
++ [pytorch_grad_cam](https://github.com/hoangtv2000/COViT/tree/master/pytorch_grad_cam): Store Heatmap visualizer by GradCAM, code of this module taken from [here](https://github.com/jacobgil/pytorch-grad-cam).
 + [trainer](https://github.com/hoangtv2000/COViT/tree/master/trainer): Store code for training phase with the ability to track evaluation metrics during this progress.
 + [utils](https://github.com/hoangtv2000/COViT/tree/master/utils): Store utility functions.
 + [TEST notebook](https://github.com/hoangtv2000/COViT/blob/master/TEST.ipynb): Notebook for inference and heatmap visualizer.
@@ -23,7 +35,12 @@ Vision Transformers</h3>
 
 
 ## C. Results
-### Model Exp.5 (PVTv2-b2-li) in COVIDx8A (214 COVID-19 test)
+### Model Exp.5
+
+Belows are the experimental results of the PVTv2-b2-li in the Exp.5, trained and tested on the COVIDx8A (214 COVID-19 test)
+
+Click [here](https://drive.google.com/file/d/19parqLAjLeRDvfSzPOuAT9LDHsu8OWbi/view?usp=sharing) to download the model checkpoint.
+
 <div class="tg-wrap"><table class="tg">
   <tr>
     <th class="tg-7btt" colspan="3">Sensitivity (%)</th>
