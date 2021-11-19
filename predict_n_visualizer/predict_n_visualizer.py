@@ -1,4 +1,5 @@
 import torch, torchvision
+import numpy as np
 import torch.nn.functional as F
 import pandas as pd
 from dataloader_n_aug.dataloader import get_test_data, get_val_data
@@ -12,6 +13,10 @@ from pytorch_grad_cam.utils.image import show_cam_on_image, preprocess_image
 
 import matplotlib.pyplot as plt
 import seaborn as sn
+
+from PIL import Image
+from dataloader_n_aug.image_aug import *
+from torchvision import transforms
 
 
 class PredictAndVisualizer:
@@ -44,6 +49,7 @@ class PredictAndVisualizer:
         self.model, _, _, _ = load_checkpoint(self.checkpoint_dirmodel, self.model)
         self.model = self.model.to(self.device)
         self.model.eval()
+
 
 
 
@@ -94,11 +100,13 @@ class PredictAndVisualizer:
 
 
 
+
     def plot_confusion_matrix(self, confusion_matrix):
         cf_df = pd.DataFrame(confusion_matrix, index = [i for i in self.class_names],
                   columns = [i for i in self.class_names])
 
         sn.heatmap(cf_df, annot=True, cmap='Blues', fmt='g')
+
 
 
 
@@ -112,7 +120,7 @@ class PredictAndVisualizer:
         # Get test data for Gradcam visualizer
         test_data_loader = get_test_data(self.config, resize4gradcam=True)
 
-        fig = plt.figure(figsize=(100, 100))
+        fig = plt.figure(figsize=(120, 120))
 
         cam = GradCAMPlusPlus(model=self.model,
                 target_layers= [self.model.pvt.block4[1].norm1],
@@ -144,18 +152,14 @@ class PredictAndVisualizer:
 
             counter+=1
             axarr[0].set_title(\
-                'Image: {:>4}\n\
-                 Ground truth: {:>4}\n\
-                 Model prediction: {:>4}'.format(counter, list(self.class_names)[int(target)],\
-                                 list(self.class_names)[prediction]))
+                'Image: {:>4}\n Ground truth: {:>4}\n Model prediction: {:>4}'\
+                .format(counter, list(self.class_names)[int(target)], list(self.class_names)[prediction]))
 
             percent_out = list(percent_pred.detach().numpy())[0]*100
 
-            axarr[1].set_title(
-                'Class confidence:\n\
-                 Pneumonia : {:.2f}%\n\
-                 Normal : {:.2f}%\n\
-                 COVID_19 : {:.2f}%'.format(percent_out[0], percent_out[1], percent_out[2]))
+            axarr[1].set_title(\
+                'Class confidence:\n Pneumonia : {:.2f}%\n Normal : {:.2f}%\n COVID_19 : {:.2f}%'\
+                .format(percent_out[0], percent_out[1], percent_out[2]))
 
             axarr[0].imshow(rgb_img)
             axarr[1].imshow(cam_image)
@@ -164,6 +168,64 @@ class PredictAndVisualizer:
             axarr[1].axis('off')
 
 
+
+
+
+    def inference(self, img_path):
+        """Inference with an any image.
+        """
+        img = Image.open(img_path).convert('RGB')
+        infer_img = img.resize(self.config.dataset.gradcam_img_size)
+
+        fig = plt.figure(figsize=(120, 120))
+
+        cam = GradCAMPlusPlus(model=self.model,
+                target_layers= [self.model.pvt.block4[1].norm1],
+                use_cuda=True,
+                reshape_transform=self.reshape_transform)
+
+        if self.config.preprocess_type == 'base' or self.config.preprocess_type == 'autoaug':
+            transform = base_test_transformation()
+            processed_img = transform(infer_img).unsqueeze(0).to(self.device)
+
+        elif self.config.preprocess_type == 'torchio':
+            convert_tensor = transforms.ToTensor()
+            converted_img = convert_tensor(infer_img).unsqueeze(3)
+
+            transform = torchio_test_transformation()
+            processed_img = transform(converted_img).squeeze(3).to(self.device)
+
+        # Cam visualize
+        grayscale_cam = cam(input_tensor=processed_img, #FF 12 times
+                        target_category=None,
+                        eigen_smooth=True,
+                        aug_smooth=True)[0, :]
+
+        # predict
+        output = self.model(processed_img)
+        percent_pred = F.softmax(output).cpu()
+        prediction = int(torch.argmax(output, dim=1).cpu())
+
+        percent_out = list(percent_pred.detach().numpy())[0]*100
+
+        rgb_img = augmentation2raw(self.config, processed_img.squeeze(0).cpu())
+        cam_image = show_cam_on_image(rgb_img, grayscale_cam)
+
+
+        print('Model prediction: {:>4}'.format(list(self.class_names)[prediction]))
+
+        print('Class confidence:\n\
+             Pneumonia : {:.2f}%\n\
+             Normal : {:.2f}%\n\
+             COVID_19 : {:.2f}%'.format(percent_out[0], percent_out[1], percent_out[2]))
+
+
+        _, axarr = plt.subplots(1,2)
+        axarr[0].imshow(infer_img)
+        axarr[1].imshow(cam_image)
+
+        axarr[0].axis('off')
+        axarr[1].axis('off')
 
 
     def reshape_transform(self, tensor, height=7, width=7):
