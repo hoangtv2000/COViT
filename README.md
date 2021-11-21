@@ -19,6 +19,7 @@ At the end of 2019, humankind was faced with an epidemic—severe acute respirat
 ## B. Technial tool
 
 Annotations for modules of the tecnical tool.
++ [config](https://github.com/hoangtv2000/COViT/tree/master/requirements.txt): File includes dependent libraries.
 + [config](https://github.com/hoangtv2000/COViT/tree/master/config): Store a configuration file used for both training and inference phase.
 + [data](https://github.com/hoangtv2000/COViT/tree/master/data): Store image and annotation files for training, validation and test, including: all_images (storing all images) folder and train/ val/ test.txt (annotation files). 
 + [dataloader_n_aug](https://github.com/hoangtv2000/COViT/tree/master/dataloader_n_aug): Store code for dataloader and 3 types of data augmentation.
