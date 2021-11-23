@@ -19,20 +19,20 @@ At the end of 2019, humankind was faced with an epidemic—severe acute respirat
 ## B. Technial tool
 
 Annotations for modules of the tecnical tool.
-+ [config](https://github.com/hoangtv2000/COViT/tree/master/requirements.txt): File includes necessary libraries.
-+ [config](https://github.com/hoangtv2000/COViT/tree/master/config): Store a configuration file used for both training and inference phase.
-+ [data](https://github.com/hoangtv2000/COViT/tree/master/data): Store image and annotation files for training, validation and test, including: all_images (storing all images) folder and train/ val/ test.txt (annotation files). 
-+ [dataloader_n_aug](https://github.com/hoangtv2000/COViT/tree/master/dataloader_n_aug): Store code for dataloader and 3 types of data augmentation.
-+ [logger](https://github.com/hoangtv2000/COViT/tree/master/logger): Store logger of the training phase.
-+ [metrics](https://github.com/hoangtv2000/COViT/tree/master/metrics): Store the specific module for calculating evaluation metric.
-+ [model](https://github.com/hoangtv2000/COViT/tree/master/model): Store models, downloaded pretrained checkpoints and modelloader.
-+ [predict_n_visualizer](https://github.com/hoangtv2000/COViT/tree/master/predict_n_visualizer): Include code for inference phase and visualizer.
-+ [pytorch_grad_cam](https://github.com/hoangtv2000/COViT/tree/master/pytorch_grad_cam): Store Heatmap visualizer by GradCAM, code of this module taken from [here](https://github.com/jacobgil/pytorch-grad-cam).
-+ [trainer](https://github.com/hoangtv2000/COViT/tree/master/trainer): Store code for training phase with the ability to track evaluation metrics during this progress.
-+ [utils](https://github.com/hoangtv2000/COViT/tree/master/utils): Store utility functions.
++ [config](https://github.com/hoangtv2000/COViT/tree/master/requirements.txt): includes necessary libraries.
++ [config](https://github.com/hoangtv2000/COViT/tree/master/config): a configuration file used for both training and inference phase.
++ [data](https://github.com/hoangtv2000/COViT/tree/master/data): Data folder, includes image and annotation files for training, validation and test, including: all_images (storing all images) folder and train/ val/ test.txt (annotation files). 
++ [dataloader_n_aug](https://github.com/hoangtv2000/COViT/tree/master/dataloader_n_aug): code for dataloader and 3 types of data augmentation.
++ [logger](https://github.com/hoangtv2000/COViT/tree/master/logger): logger of the training phase.
++ [metrics](https://github.com/hoangtv2000/COViT/tree/master/metrics): specific module for calculating evaluation metric.
++ [model](https://github.com/hoangtv2000/COViT/tree/master/model): models, downloaded pretrained checkpoints and modelloader.
++ [predict_n_visualizer](https://github.com/hoangtv2000/COViT/tree/master/predict_n_visualizer): code for inference phase and visualizer.
++ [pytorch_grad_cam](https://github.com/hoangtv2000/COViT/tree/master/pytorch_grad_cam): heatmap visualizer by GradCAM, code of this module taken from [here](https://github.com/jacobgil/pytorch-grad-cam).
++ [trainer](https://github.com/hoangtv2000/COViT/tree/master/trainer): code for training phase with the ability to track evaluation metrics during this progress.
++ [utils](https://github.com/hoangtv2000/COViT/tree/master/utils): utility functions.
 + [TEST notebook](https://github.com/hoangtv2000/COViT/blob/master/TEST.ipynb): Notebook for inference and heatmap visualizer.
 + [TRAIN notebook](https://github.com/hoangtv2000/COViT/blob/master/TRAIN.ipynb): Notebook for training.
-+ [alternative_dataloader](https://github.com/hoangtv2000/COViT/tree/master/alternative_dataloader): Store alternative method for dataloader. Replace files which have the same name with files in this folder in these folders above.
++ [alternative_dataloader](https://github.com/hoangtv2000/COViT/tree/master/alternative_dataloader): alternative method for dataloader. Replace files which have the same name with files in this folder in these folders above.
 
 
 ## C. Results
