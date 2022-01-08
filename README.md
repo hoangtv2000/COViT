@@ -14,7 +14,7 @@ At the end of 2019, humankind was faced with an epidemic—severe acute respirat
 
 #### ⭐ For detail of report, watch [this paper](https://github.com/hoangtv2000/COViT/blob/master/paper.pdf).
 
-#### ⭐ For slide of the seminar, watch [here](https://docs.google.com/presentation/d/1jm7SXEqmMi34HPYUbEk2Falys974G5Gi/edit?usp=sharing&ouid=114052551064589379844&rtpof=true&sd=true).
+#### ⭐ For slide of the seminar, watch [here](https://github.com/hoangtv2000/COViT/blob/master/CS406.pptx).
 
 ## B. Technial tool
 
