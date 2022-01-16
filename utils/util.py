@@ -98,7 +98,7 @@ def optimizer_to_cuda(optimizer, device):
 
 
 def augmentation2raw(config, inp, show=False):
-    """Convert augmentated image to raw image.
+    """Convert normalized image to raw image.
     """
     if config.preprocess_type == 'torchio':
         mean = np.array([0.5, 0.5, 0.5])
